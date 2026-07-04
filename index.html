@@ -265,8 +265,11 @@
       display: grid;
       gap: 0;
       max-height: calc(100vh - 210px);
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
     }
 
     .product {
@@ -622,8 +625,19 @@
         grid-template-columns: 1fr;
       }
 
-      .list, .order-list {
+      .order-list {
         max-height: none;
+      }
+
+      .list {
+        max-height: 58vh;
+        max-height: 58dvh;
+        min-height: 320px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: auto;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
       }
 
       .order-panel {
