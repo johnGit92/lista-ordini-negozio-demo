@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lista ordini negozio</title>
+  <style>
+    :root {
+      --bg: #f7f5ef;
+      --surface: #ffffff;
+      --surface-2: #f0eee6;
+      --ink: #202124;
+      --muted: #65615a;
+      --line: #d8d2c4;
+      --primary: #176b55;
+      --primary-2: #0e4e3e;
+      --clean: #13748a;
+      --accent: #b44a39;
+      --amber: #c18419;
+      --fresh: #7a3f63;
+      --shadow: 0 14px 40px rgba(32, 33, 36, .11);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(23, 107, 85, .08), transparent 280px),
+        var(--bg);
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 0 12px;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .date-pill {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      min-width: 92px;
+      height: 54px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, .7);
+      border-radius: var(--radius);
+      font-weight: 760;
+      color: var(--primary-2);
+      text-align: center;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .share-demo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 54px;
+      padding: 0 14px;
+      border: 1px solid var(--primary);
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      line-height: 1.05;
+      white-space: nowrap;
+    }
+
+    .share-demo svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .demo-share-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid rgba(23, 107, 85, .22);
+      border-radius: var(--radius);
+      background: rgba(23, 107, 85, .08);
+    }
+
+    .demo-share-panel[hidden] {
+      display: none;
+    }
+
+    .demo-share-panel input {
+      height: 42px;
+      font-size: 14px;
+      color: var(--primary-2);
+      background: #fff;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      min-height: 68px;
+      padding: 12px;
+      border: 1px solid rgba(216, 210, 196, .92);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .76);
+      box-shadow: 0 10px 30px rgba(32, 33, 36, .07);
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      color: #fff;
+    }
+
+    .stat:nth-child(1) .stat-icon { background: var(--primary); }
+    .stat:nth-child(2) .stat-icon { background: var(--clean); }
+    .stat:nth-child(3) .stat-icon { background: var(--accent); }
+
+    .stat-icon svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .stat-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 2px;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid rgba(216, 210, 196, .9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(130px, 180px) minmax(130px, 180px);
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(240, 238, 230, .7);
+    }
+
+    .field {
+      position: relative;
+      min-width: 0;
+    }
+
+    .field svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 19px;
+      height: 19px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      outline: 0;
+    }
+
+    input, select {
+      height: 46px;
+      padding: 0 12px;
+    }
+
+    .field input {
+      padding-left: 40px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(23, 107, 85, .13);
+    }
+
+    .list {
+      display: grid;
+      gap: 0;
+      max-height: calc(100vh - 210px);
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .product {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 136px;
+      gap: 12px;
+      align-items: center;
+      min-height: 78px;
+      padding: 12px 12px 12px 16px;
+      border-bottom: 1px solid rgba(216, 210, 196, .72);
+      background: #fff;
+    }
+
+    .product::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 4px;
+      border-radius: 0 999px 999px 0;
+      background: var(--muted);
+    }
+
+    .product.cat-alimentari::before { background: var(--primary); }
+    .product.cat-detersivi::before { background: var(--clean); }
+    .product.cat-carta::before { background: var(--amber); }
+    .product.cat-banco::before { background: var(--fresh); }
+
+    .product:last-child { border-bottom: 0; }
+
+    .product-main {
+      min-width: 0;
+    }
+
+    .product-name {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 720;
+      overflow-wrap: anywhere;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      max-width: 100%;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 680;
+      white-space: nowrap;
+    }
+
+    .tag.supplier {
+      background: rgba(23, 107, 85, .1);
+      color: var(--primary-2);
+    }
+
+    .tag.cat-alimentari {
+      background: rgba(23, 107, 85, .1);
+      color: var(--primary-2);
+    }
+
+    .tag.cat-detersivi {
+      background: rgba(19, 116, 138, .12);
+      color: #0d5364;
+    }
+
+    .tag.cat-carta {
+      background: rgba(193, 132, 25, .14);
+      color: #75500f;
+    }
+
+    .tag.cat-banco {
+      background: rgba(122, 63, 99, .12);
+      color: #673452;
+    }
+
+    .qty-control {
+      display: grid;
+      grid-template-columns: 40px minmax(46px, 1fr) 40px;
+      align-items: center;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .qty-control button {
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: var(--primary-2);
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .qty-control button:active { background: rgba(23, 107, 85, .11); }
+
+    .qty-control input {
+      height: 42px;
+      min-width: 0;
+      padding: 0 4px;
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      text-align: center;
+      font-weight: 800;
+      color: var(--primary-2);
+      box-shadow: none;
+    }
+
+    .order-panel {
+      position: sticky;
+      top: 12px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(240, 238, 230, .7);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      height: 30px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .order-list {
+      max-height: calc(100vh - 330px);
+      overflow: auto;
+    }
+
+    .empty {
+      padding: 22px 14px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .order-item {
+      display: grid;
+      gap: 9px;
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(216, 210, 196, .72);
+    }
+
+    .order-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .order-title {
+      min-width: 0;
+      font-weight: 760;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .order-qty {
+      color: var(--primary-2);
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .note-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 38px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    textarea {
+      min-height: 38px;
+      max-height: 110px;
+      resize: vertical;
+      padding: 9px 10px;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--accent);
+    }
+
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      background: rgba(240, 238, 230, .65);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: var(--radius);
+      font-weight: 780;
+      line-height: 1.05;
+      text-align: center;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn.warn {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn.amber {
+      color: #fff;
+      background: var(--amber);
+      border-color: var(--amber);
+    }
+
+    .catalog-tools {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .catalog-tools summary {
+      cursor: pointer;
+      font-weight: 780;
+      color: var(--primary-2);
+      user-select: none;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .catalog-tools textarea {
+      min-height: 112px;
+      grid-column: 1 / -1;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(24px);
+      max-width: min(92vw, 460px);
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      background: #202124;
+      color: #fff;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      font-weight: 700;
+      z-index: 30;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        padding: 12px;
+        padding-bottom: calc(18px + env(safe-area-inset-bottom));
+      }
+
+      .topbar {
+        align-items: start;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-share-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .list, .order-list {
+        max-height: none;
+      }
+
+      .order-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .date-pill {
+        min-width: 78px;
+        height: 48px;
+        font-size: 13px;
+      }
+
+      .top-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .share-demo {
+        width: 48px;
+        min-height: 48px;
+        padding: 0;
+      }
+
+      .share-demo span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+
+      .product {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .qty-control {
+        width: min(100%, 220px);
+      }
+
+      .actions, .catalog-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Lista ordini</h1>
+        <p>Alimentari e detersivi</p>
+      </div>
+      <div class="top-actions">
+        <button class="share-demo" id="shareDemoBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"></path>
+            <path d="M16 6l-4-4-4 4"></path>
+            <path d="M12 2v13"></path>
+          </svg>
+          <span>Condividi demo</span>
+        </button>
+        <div class="date-pill" id="todayLabel" aria-label="Data"></div>
+      </div>
+    </header>
+
+    <section class="demo-share-panel" id="demoSharePanel" hidden aria-label="Link demo">
+      <input id="demoShareUrl" type="text" readonly value="">
+      <button class="btn primary" id="copyDemoLinkBtn" type="button">Copia link</button>
+    </section>
+
+    <section class="summary" aria-label="Riepilogo ordine">
+      <div class="stat">
+        <span class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19V5"></path>
+            <path d="M8 19V5"></path>
+            <path d="M12 19V5"></path>
+            <path d="M16 19V5"></path>
+            <path d="M20 19V5"></path>
+          </svg>
+        </span>
+        <p class="stat-label">Articoli <span class="stat-value" id="statItems">0</span></p>
+      </div>
+      <div class="stat">
+        <span class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 5h12"></path>
+            <path d="M8 5v14h8V5"></path>
+            <path d="M10 9h4"></path>
+            <path d="M10 13h4"></path>
+          </svg>
+        </span>
+        <p class="stat-label">Pezzi <span class="stat-value" id="statPieces">0</span></p>
+      </div>
+      <div class="stat">
+        <span class="stat-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 7h18"></path>
+            <path d="M5 7v12h14V7"></path>
+            <path d="M9 11h6"></path>
+            <path d="M9 15h3"></path>
+          </svg>
+        </span>
+        <p class="stat-label">Fornitori <span class="stat-value" id="statSuppliers">0</span></p>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="Gestione ordini">
+      <div class="panel">
+        <div class="toolbar">
+          <label class="field" aria-label="Ricerca">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.5-3.5"></path>
+            </svg>
+            <input id="searchInput" type="search" autocomplete="off" placeholder="Cerca prodotto">
+          </label>
+          <select id="categoryFilter" aria-label="Categoria"></select>
+          <select id="supplierFilter" aria-label="Fornitore"></select>
+        </div>
+        <div class="list" id="productList" aria-live="polite"></div>
+      </div>
+
+      <aside class="panel order-panel">
+        <div class="panel-header">
+          <h2>Ordine</h2>
+          <span class="count" id="orderCount">0</span>
+        </div>
+        <div class="order-list" id="orderList"></div>
+        <div class="actions">
+          <button class="btn primary" id="shareBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"></path>
+              <path d="M16 6l-4-4-4 4"></path>
+              <path d="M12 2v13"></path>
+            </svg>
+            Condividi
+          </button>
+          <button class="btn" id="copyBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copia
+          </button>
+          <button class="btn amber" id="csvBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M12 15V3"></path>
+            </svg>
+            CSV
+          </button>
+          <button class="btn warn" id="clearBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M19 6l-1 14H6L5 6"></path>
+            </svg>
+            Svuota
+          </button>
+        </div>
+        <details class="catalog-tools">
+          <summary>Catalogo</summary>
+          <div class="catalog-grid">
+            <input id="newProductName" type="text" placeholder="Nuovo prodotto">
+            <input id="newSupplier" type="text" placeholder="Fornitore">
+            <select id="newCategory" aria-label="Categoria nuovo prodotto">
+              <option>Alimentari</option>
+              <option>Detersivi</option>
+              <option>Carta</option>
+              <option>Banco</option>
+              <option>Altro</option>
+            </select>
+            <button class="btn primary" id="addProductBtn" type="button">Aggiungi</button>
+            <textarea id="bulkImport" placeholder="Prodotto; categoria; fornitore"></textarea>
+            <button class="btn" id="importBtn" type="button">Importa righe</button>
+            <button class="btn" id="resetCatalogBtn" type="button">Ripristina demo</button>
+          </div>
+        </details>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const CATALOG_KEY = "negozio_catalogo_v1";
+    const ORDER_KEY = "negozio_ordine_v1";
+    const LAN_DEMO_URL = "http://192.168.1.246:8765/lista-ordini-negozio.html";
+
+    const seedCatalog = [
+      ["Ace candeggina classica 3 L", "Detersivi", "Orizzonte"],
+      ["Ammorbidente Felce Azzurra 3 L", "Detersivi", "Orizzonte"],
+      ["Ammorbidente Spuma di Sciampagna 3 L", "Detersivi", "Orizzonte"],
+      ["Bref WC gel", "Detersivi", "Orizzonte"],
+      ["Carta igienica 4 rotoli", "Carta", "Orizzonte"],
+      ["Carta cucina 2 rotoli", "Carta", "Orizzonte"],
+      ["Chanteclair sgrassatore universale", "Detersivi", "Orizzonte"],
+      ["Dash lavatrice liquido", "Detersivi", "Orizzonte"],
+      ["Detersivo piatti limone 1 L", "Detersivi", "Orizzonte"],
+      ["Dixan lavatrice polvere", "Detersivi", "Orizzonte"],
+      ["Domestos candeggina gel", "Detersivi", "Orizzonte"],
+      ["Fazzoletti 10 pacchetti", "Carta", "Orizzonte"],
+      ["Finish pastiglie lavastoviglie", "Detersivi", "Orizzonte"],
+      ["Lysoform casa 1 L", "Detersivi", "Orizzonte"],
+      ["Napisan additivo bucato", "Detersivi", "Orizzonte"],
+      ["Sacchi pattumiera 55 L", "Carta", "Orizzonte"],
+      ["Scottex casa", "Carta", "Orizzonte"],
+      ["Svelto piatti 1 L", "Detersivi", "Orizzonte"],
+      ["Vetril spray", "Detersivi", "Orizzonte"],
+      ["Acqua naturale 1,5 L", "Alimentari", "Bevande"],
+      ["Acqua frizzante 1,5 L", "Alimentari", "Bevande"],
+      ["Birra Peroni 66 cl", "Alimentari", "Bevande"],
+      ["Coca-Cola 1,5 L", "Alimentari", "Bevande"],
+      ["Succhi frutta pera 1 L", "Alimentari", "Bevande"],
+      ["Latte UHT intero 1 L", "Alimentari", "Generi"],
+      ["Pasta spaghetti 500 g", "Alimentari", "Generi"],
+      ["Pasta penne 500 g", "Alimentari", "Generi"],
+      ["Passata pomodoro 700 g", "Alimentari", "Generi"],
+      ["Olio semi 1 L", "Alimentari", "Generi"],
+      ["Tonno 3x80 g", "Alimentari", "Generi"],
+      ["Zucchero 1 kg", "Alimentari", "Generi"],
+      ["Farina 00 1 kg", "Alimentari", "Generi"],
+      ["Caffe macinato 250 g", "Alimentari", "Generi"],
+      ["Biscotti frollini", "Alimentari", "Generi"],
+      ["Cracker salati", "Alimentari", "Generi"],
+      ["Patatine classiche", "Alimentari", "Snack"],
+      ["Mozzarella 125 g", "Banco", "Fresco"],
+      ["Prosciutto cotto vaschetta", "Banco", "Fresco"],
+      ["Yogurt intero multipack", "Banco", "Fresco"]
+    ].map(([name, category, supplier], index) => ({
+      id: `seed-${index + 1}`,
+      name,
+      category,
+      supplier
+    }));
+
+    let catalog = load(CATALOG_KEY, seedCatalog);
+    let order = load(ORDER_KEY, {});
+
+    const els = {
+      today: document.getElementById("todayLabel"),
+      search: document.getElementById("searchInput"),
+      category: document.getElementById("categoryFilter"),
+      supplier: document.getElementById("supplierFilter"),
+      productList: document.getElementById("productList"),
+      orderList: document.getElementById("orderList"),
+      orderCount: document.getElementById("orderCount"),
+      statItems: document.getElementById("statItems"),
+      statPieces: document.getElementById("statPieces"),
+      statSuppliers: document.getElementById("statSuppliers"),
+      shareDemo: document.getElementById("shareDemoBtn"),
+      copyDemoLink: document.getElementById("copyDemoLinkBtn"),
+      demoSharePanel: document.getElementById("demoSharePanel"),
+      demoShareUrl: document.getElementById("demoShareUrl"),
+      share: document.getElementById("shareBtn"),
+      copy: document.getElementById("copyBtn"),
+      csv: document.getElementById("csvBtn"),
+      clear: document.getElementById("clearBtn"),
+      newProductName: document.getElementById("newProductName"),
+      newSupplier: document.getElementById("newSupplier"),
+      newCategory: document.getElementById("newCategory"),
+      addProduct: document.getElementById("addProductBtn"),
+      bulkImport: document.getElementById("bulkImport"),
+      importBtn: document.getElementById("importBtn"),
+      resetCatalog: document.getElementById("resetCatalogBtn"),
+      toast: document.getElementById("toast")
+    };
+
+    els.today.textContent = new Intl.DateTimeFormat("it-IT", {
+      day: "2-digit",
+      month: "short"
+    }).format(new Date());
+
+    bindEvents();
+    render();
+
+    function load(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function save() {
+      localStorage.setItem(CATALOG_KEY, JSON.stringify(catalog));
+      localStorage.setItem(ORDER_KEY, JSON.stringify(order));
+    }
+
+    function bindEvents() {
+      [els.search, els.category, els.supplier].forEach(el => {
+        el.addEventListener("input", renderProducts);
+      });
+
+      els.productList.addEventListener("click", event => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+        const id = button.closest(".product").dataset.id;
+        const delta = button.dataset.action === "inc" ? 1 : -1;
+        setQuantity(id, (order[id]?.qty || 0) + delta);
+      });
+
+      els.productList.addEventListener("input", event => {
+        if (!event.target.matches("input[data-qty]")) return;
+        const id = event.target.closest(".product").dataset.id;
+        setQuantity(id, Number(event.target.value || 0));
+      });
+
+      els.orderList.addEventListener("input", event => {
+        if (!event.target.matches("textarea[data-note]")) return;
+        const id = event.target.closest(".order-item").dataset.id;
+        if (!order[id]) return;
+        order[id].note = event.target.value;
+        save();
+      });
+
+      els.orderList.addEventListener("click", event => {
+        const button = event.target.closest("button[data-remove]");
+        if (!button) return;
+        delete order[button.closest(".order-item").dataset.id];
+        save();
+        render();
+      });
+
+      els.share.addEventListener("click", shareOrder);
+      els.shareDemo.addEventListener("click", shareDemo);
+      els.copyDemoLink.addEventListener("click", copyVisibleDemoLink);
+      els.copy.addEventListener("click", copyOrder);
+      els.csv.addEventListener("click", downloadCsv);
+      els.clear.addEventListener("click", clearOrder);
+      els.addProduct.addEventListener("click", addProduct);
+      els.importBtn.addEventListener("click", importRows);
+      els.resetCatalog.addEventListener("click", resetCatalog);
+    }
+
+    function render() {
+      fillFilters();
+      renderProducts();
+      renderOrder();
+      renderStats();
+    }
+
+    function fillFilters() {
+      const selectedCategory = els.category.value || "Tutte";
+      const selectedSupplier = els.supplier.value || "Tutti";
+      fillSelect(els.category, ["Tutte", ...unique(catalog.map(item => item.category))], selectedCategory);
+      fillSelect(els.supplier, ["Tutti", ...unique(catalog.map(item => item.supplier))], selectedSupplier);
+    }
+
+    function fillSelect(select, values, selected) {
+      select.innerHTML = values.map(value => (
+        `<option${value === selected ? " selected" : ""}>${escapeHtml(value)}</option>`
+      )).join("");
+    }
+
+    function unique(values) {
+      return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
+    }
+
+    function renderProducts() {
+      const query = normalize(els.search.value);
+      const category = els.category.value;
+      const supplier = els.supplier.value;
+      const filtered = catalog
+        .filter(item => !query || normalize(`${item.name} ${item.category} ${item.supplier}`).includes(query))
+        .filter(item => category === "Tutte" || item.category === category)
+        .filter(item => supplier === "Tutti" || item.supplier === supplier)
+        .sort((a, b) => a.name.localeCompare(b.name, "it"));
+
+      els.productList.innerHTML = filtered.length ? filtered.map(productRow).join("") :
+        `<div class="empty">Nessun prodotto trovato</div>`;
+    }
+
+    function productRow(item) {
+      const qty = order[item.id]?.qty || 0;
+      const catClass = categoryClass(item.category);
+      return `
+        <article class="product ${catClass}" data-id="${item.id}">
+          <div class="product-main">
+            <h3 class="product-name">${escapeHtml(item.name)}</h3>
+            <div class="product-meta">
+              <span class="tag ${catClass}">${escapeHtml(item.category || "Altro")}</span>
+              <span class="tag supplier">${escapeHtml(item.supplier || "Senza fornitore")}</span>
+            </div>
+          </div>
+          <div class="qty-control" aria-label="Quantita ${escapeHtml(item.name)}">
+            <button type="button" data-action="dec" aria-label="Diminuisci">-</button>
+            <input data-qty type="number" min="0" step="1" inputmode="numeric" value="${qty}" aria-label="Quantita">
+            <button type="button" data-action="inc" aria-label="Aumenta">+</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderOrder() {
+      const rows = orderRows();
+      els.orderCount.textContent = rows.length;
+      els.orderList.innerHTML = rows.length ? rows.map(orderRow).join("") :
+        `<div class="empty">Lista vuota</div>`;
+      renderStats();
+    }
+
+    function renderStats() {
+      const rows = orderRows();
+      els.statItems.textContent = rows.length;
+      els.statPieces.textContent = rows.reduce((total, item) => total + item.qty, 0);
+      els.statSuppliers.textContent = unique(rows.map(item => item.supplier)).length;
+    }
+
+    function orderRows() {
+      return Object.entries(order)
+        .map(([id, value]) => ({ ...catalog.find(item => item.id === id), ...value, id }))
+        .filter(item => item.name && item.qty > 0)
+        .sort((a, b) => (a.supplier || "").localeCompare(b.supplier || "", "it") || a.name.localeCompare(b.name, "it"));
+    }
+
+    function orderRow(item) {
+      return `
+        <article class="order-item" data-id="${item.id}">
+          <div class="order-line">
+            <div class="order-title">${escapeHtml(item.name)}</div>
+            <div class="order-qty">x ${item.qty}</div>
+          </div>
+          <div class="note-row">
+            <textarea data-note placeholder="Nota">${escapeHtml(item.note || "")}</textarea>
+            <button class="icon-btn" type="button" data-remove aria-label="Rimuovi">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18"></path>
+                <path d="m6 6 12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </article>
+      `;
+    }
+
+    function setQuantity(id, qty) {
+      const cleanQty = Math.max(0, Math.floor(Number.isFinite(qty) ? qty : 0));
+      if (cleanQty === 0) {
+        delete order[id];
+      } else {
+        order[id] = { ...(order[id] || {}), qty: cleanQty };
+      }
+      save();
+      renderProducts();
+      renderOrder();
+    }
+
+    function addProduct() {
+      const name = els.newProductName.value.trim();
+      if (!name) {
+        toast("Inserisci il prodotto");
+        return;
+      }
+      const item = {
+        id: `custom-${Date.now()}`,
+        name,
+        category: els.newCategory.value || "Altro",
+        supplier: els.newSupplier.value.trim() || "Da assegnare"
+      };
+      catalog = dedupeCatalog([...catalog, item]);
+      els.newProductName.value = "";
+      els.newSupplier.value = "";
+      save();
+      render();
+      toast("Prodotto aggiunto");
+    }
+
+    function importRows() {
+      const rows = els.bulkImport.value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+      if (!rows.length) {
+        toast("Nessuna riga da importare");
+        return;
+      }
+      const imported = rows.map((line, index) => {
+        const [name, category = "Altro", supplier = "Da assegnare"] = line.split(/[;\t,]/).map(part => part.trim());
+        return name ? {
+          id: `import-${Date.now()}-${index}`,
+          name,
+          category: category || "Altro",
+          supplier: supplier || "Da assegnare"
+        } : null;
+      }).filter(Boolean);
+
+      catalog = dedupeCatalog([...catalog, ...imported]);
+      els.bulkImport.value = "";
+      save();
+      render();
+      toast(`${imported.length} prodotti importati`);
+    }
+
+    function dedupeCatalog(items) {
+      const seen = new Map();
+      items.forEach(item => {
+        const key = normalize(item.name);
+        if (!seen.has(key)) seen.set(key, item);
+      });
+      return [...seen.values()];
+    }
+
+    function resetCatalog() {
+      catalog = seedCatalog;
+      order = {};
+      save();
+      render();
+      toast("Catalogo demo ripristinato");
+    }
+
+    function clearOrder() {
+      if (!orderRows().length) return;
+      order = {};
+      save();
+      render();
+      toast("Ordine svuotato");
+    }
+
+    function buildOrderText() {
+      const rows = orderRows();
+      if (!rows.length) return "";
+      const date = new Intl.DateTimeFormat("it-IT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }).format(new Date());
+      const grouped = rows.reduce((acc, item) => {
+        const supplier = item.supplier || "Senza fornitore";
+        acc[supplier] = acc[supplier] || [];
+        acc[supplier].push(item);
+        return acc;
+      }, {});
+      const parts = [`Ordine ${date}`];
+      Object.entries(grouped).forEach(([supplier, items]) => {
+        parts.push("", supplier);
+        items.forEach(item => {
+          const note = item.note ? ` - ${item.note.trim()}` : "";
+          parts.push(`- ${item.qty} x ${item.name}${note}`);
+        });
+      });
+      return parts.join("\n");
+    }
+
+    async function shareOrder() {
+      const text = buildOrderText();
+      if (!text) {
+        toast("Lista vuota");
+        return;
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Lista ordini", text });
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+      await copyText(text);
+      toast("Lista copiata");
+    }
+
+    async function shareDemo() {
+      const host = window.location.hostname;
+      const url = (host === "127.0.0.1" || host === "localhost") ? LAN_DEMO_URL : window.location.href;
+      showDemoLink(url);
+      if (host === "127.0.0.1" || host === "localhost") {
+        toast("Condivido il link Wi-Fi");
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Demo lista ordini",
+            text: "Prova la demo per preparare la lista ordini del negozio.",
+            url
+          });
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+      try {
+        await copyText(url);
+        toast("Link demo copiato");
+      } catch {
+        toast("Link disponibile sotto");
+      }
+    }
+
+    async function copyVisibleDemoLink() {
+      const url = els.demoShareUrl.value;
+      if (!url) return;
+      try {
+        await copyText(url);
+        toast("Link demo copiato");
+      } catch {
+        els.demoShareUrl.focus();
+        els.demoShareUrl.select();
+        toast("Seleziona e copia il link");
+      }
+    }
+
+    function showDemoLink(url) {
+      els.demoShareUrl.value = url;
+      els.demoSharePanel.hidden = false;
+    }
+
+    async function copyOrder() {
+      const text = buildOrderText();
+      if (!text) {
+        toast("Lista vuota");
+        return;
+      }
+      await copyText(text);
+      toast("Lista copiata");
+    }
+
+    function downloadCsv() {
+      const rows = orderRows();
+      if (!rows.length) {
+        toast("Lista vuota");
+        return;
+      }
+      const header = ["Fornitore", "Categoria", "Prodotto", "Quantita", "Note"];
+      const csv = [header, ...rows.map(item => [
+        item.supplier || "",
+        item.category || "",
+        item.name,
+        item.qty,
+        item.note || ""
+      ])].map(row => row.map(csvCell).join(";")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `lista-ordini-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+
+    function csvCell(value) {
+      return `"${String(value).replaceAll('"', '""')}"`;
+    }
+
+    function normalize(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    function categoryClass(category) {
+      const value = normalize(category);
+      if (value.includes("alimentari")) return "cat-alimentari";
+      if (value.includes("detersivi")) return "cat-detersivi";
+      if (value.includes("carta")) return "cat-carta";
+      if (value.includes("banco")) return "cat-banco";
+      return "cat-altro";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    let toastTimer;
+    function toast(message) {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 1700);
+    }
+  </script>
+</body>
+</html>
